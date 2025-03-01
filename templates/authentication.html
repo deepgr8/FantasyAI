@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GenCrick - Authentication</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0c0e17 0%, #111827 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 10%;
+    }
+
+    .logo {
+      color: #00abff;
+      font-size: 26px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .beta {
+      font-size: 10px;
+      background-color: #00abff;
+      color: black;
+      padding: 2px 5px;
+      border-radius: 4px;
+      position: relative;
+      top: -10px;
+      left: -5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .sign-up-btn {
+      background-color: #00abff;
+      color: white;
+      padding: 10px 30px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+    }
+
+    .sign-up-btn:hover {
+      background-color: #0090db;
+    }
+
+    .sign-up-btn:active {
+      transform: scale(0.98);
+    }
+
+    .auth-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .auth-card {
+      background-color: rgba(19, 25, 40, 0.9);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .auth-header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #fff, #00abff, #00e4a1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .auth-header p {
+      color: #8e9ab4;
+      font-size: 16px;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #2a344a;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: #8e9ab4;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.3s, transform 0.1s;
+    }
+
+    .tab-btn:active {
+      transform: scale(0.98);
+    }
+
+    .tab-btn.active {
+      color: #00abff;
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #00abff, #00e4a1);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .form-content {
+      display: none;
+    }
+
+    .form-content.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      color: #8e9ab4;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background-color: #1a2335;
+      border: 1px solid #2a344a;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #00abff;
+      box-shadow: 0 0 0 2px rgba(0, 171, 255, 0.2);
+    }
+
+    .form-input.error {
+      border-color: #ff3860;
+    }
+
+    .error-message {
+      color: #ff3860;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .error-message.visible {
+      display: block;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 45px;
+      cursor: pointer;
+      color: #8e9ab4;
+      background: none;
+      border: none;
+      font-size: 14px;
+    }
+
+    .password-strength {
+      height: 5px;
+      margin-top: 8px;
+      border-radius: 5px;
+      background-color: #2a344a;
+      overflow: hidden;
+      display: none;
+    }
+
+    .password-strength.visible {
+      display: block;
+    }
+
+    .strength-meter {
+      height: 100%;
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.3s, background-color 0.3s;
+    }
+
+    .strength-text {
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .strength-text.visible {
+      display: block;
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .custom-checkbox {
+      position: relative;
+      height: 18px;
+      width: 18px;
+    }
+
+    .custom-checkbox input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 18px;
+      width: 18px;
+      background-color: #1a2335;
+      border: 1px solid #2a344a;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .custom-checkbox:hover input ~ .checkmark {
+      border-color: #00abff;
+    }
+
+    .custom-checkbox input:checked ~ .checkmark {
+      background-color: #00abff;
+      border-color: #00abff;
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .custom-checkbox input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    .custom-checkbox .checkmark:after {
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .forgot-link {
+      color: #00abff;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .forgot-link:hover {
+      color: #0090db;
+      text-decoration: underline;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, #00abff, #00e4a1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.3s, transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover {
+      opacity: 0.9;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .submit-btn .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.4);
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    .alternate-auth {
+      margin-top: 24px;
+      text-align: center;
+      color: #8e9ab4;
+      font-size: 14px;
+    }
+
+    .social-auth {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .social-btn {
+      background-color: #1a2335;
+      border: 1px solid #2a344a;
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+    }
+
+    .social-btn:hover {
+      background-color: #232d42;
+    }
+
+    .social-btn:active {
+      transform: scale(0.95);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #8e9ab4;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .navbar {
+        padding: 15px 5%;
+      }
+
+      .auth-card {
+        padding: 30px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-header h1 {
+        font-size: 24px;
+      }
+
+      .auth-card {
+        padding: 25px 15px;
+      }
+
+      .social-auth {
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="#" class="logo">GenCrick<span class="beta">BETA</span></a>
+    <div class="nav-links">
+      <a href="./features">Features</a>
+      <a href="./features">How It Works</a>
+      <a href="./features">Testimonials</a>
+    </div>
+    <button class="sign-up-btn" id="navSignUpBtn">Sign Up</button>
+  </nav>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome to GenCrick</h1>
+        <p id="auth-subtitle">Sign in to access AI-powered cricket analytics</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" id="signin-tab">Sign In</button>
+        <button class="tab-btn" id="signup-tab">Sign Up</button>
+      </div>
+
+      <div class="form-content active" id="signin-form">
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="login-email" placeholder="Enter your email" required>
+            <div class="error-message" id="login-email-error">Please enter a valid email address</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="login-password" placeholder="Enter your password" required>
+            <button type="button" class="password-toggle" id="login-toggle-password">Show</button>
+            <div class="error-message" id="login-password-error">Password is required</div>
+          </div>
+
+          <div class="remember-forgot">
+            <div class="checkbox-group">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="remember">
+                <span class="checkmark"></span>
+              </label>
+              <label for="remember">Remember me</label>
+            </div>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="submit-btn" id="login-btn">Sign In</button>
+        </form>
+      </div>
+
+      <div class="form-content" id="signup-form">
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="register-email" placeholder="Enter your email" required>
+            <div class="error-message" id="register-email-error">Please enter a valid email address</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="register-password" placeholder="Create a password" required>
+            <button type="button" class="password-toggle" id="register-toggle-password">Show</button>
+            <div class="password-strength" id="password-strength">
+              <div class="strength-meter" id="strength-meter"></div>
+            </div>
+            <div class="strength-text" id="strength-text">Password must be at least 8 characters</div>
+            <div class="error-message" id="register-password-error">Password must be at least 8 characters</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-input" id="confirm-password" placeholder="Confirm your password" required>
+            <div class="error-message" id="confirm-password-error">Passwords do not match</div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="register-btn">Sign Up</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 GenCrick. All rights reserved.
+  </footer>
+
+  <script>
+    // Tab switching functionality
+    const signinTab = document.getElementById('signin-tab');
+    const signupTab = document.getElementById('signup-tab');
+    const signinForm = document.getElementById('signin-form');
+    const signupForm = document.getElementById('signup-form');
+    const authSubtitle = document.getElementById('auth-subtitle');
+    const navSignUpBtn = document.getElementById('navSignUpBtn');
+
+    signinTab.addEventListener('click', () => {
+      signinTab.classList.add('active');
+      signupTab.classList.remove('active');
+      signinForm.classList.add('active');
+      signupForm.classList.remove('active');
+      authSubtitle.textContent = 'Sign in to access AI-powered cricket analytics';
+      addHapticFeedback();
+    });
+
+    signupTab.addEventListener('click', () => {
+      signupTab.classList.add('active');
+      signinTab.classList.remove('active');
+      signupForm.classList.add('active');
+      signinForm.classList.remove('active');
+      authSubtitle.textContent = 'Create an account to start winning with AI analytics';
+      addHapticFeedback();
+    });
+
+    navSignUpBtn.addEventListener('click', () => {
+      signupTab.click();
+      addHapticFeedback();
+    });
+
+    // Password toggle functionality
+    const loginTogglePassword = document.getElementById('login-toggle-password');
+    const registerTogglePassword = document.getElementById('register-toggle-password');
+    const loginPassword = document.getElementById('login-password');
+    const registerPassword = document.getElementById('register-password');
+
+    loginTogglePassword.addEventListener('click', () => {
+      togglePasswordVisibility(loginPassword, loginTogglePassword);
+      addHapticFeedback();
+    });
+
+    registerTogglePassword.addEventListener('click', () => {
+      togglePasswordVisibility(registerPassword, registerTogglePassword);
+      addHapticFeedback();
+    });
+
+    function togglePasswordVisibility(passwordField, toggleButton) {
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleButton.textContent = 'Hide';
+      } else {
+        passwordField.type = 'password';
+        toggleButton.textContent = 'Show';
+      }
+    }
+
+    // Password strength meter
+    const passwordStrength = document.getElementById('password-strength');
+    const strengthMeter = document.getElementById('strength-meter');
+    const strengthText = document.getElementById('strength-text');
+
+    registerPassword.addEventListener('input', () => {
+      const password = registerPassword.value;
+      passwordStrength.classList.add('visible');
+      strengthText.classList.add('visible');
+      
+      let strength = 0;
+      let message = '';
+
+      if (password.length >= 8) strength += 25;
+      if (password.match(/[A-Z]/)) strength += 25;
+      if (password.match(/[0-9]/)) strength += 25;
+      if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+
+      strengthMeter.style.width = strength + '%';
+
+      if (strength <= 25) {
+        strengthMeter.style.backgroundColor = '#ff3860';
+        message = 'Weak password';
+      } else if (strength <= 50) {
+        strengthMeter.style.backgroundColor = '#ffdd57';
+        message = 'Fair password';
+      } else if (strength <= 75) {
+        strengthMeter.style.backgroundColor = '#00d1b2';
+        message = 'Good password';
+      } else {
+        strengthMeter.style.backgroundColor = '#23d160';
+        message = 'Strong password';
+      }
+
+      strengthText.textContent = message;
+    });
+
+    // Form validation
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginEmail = document.getElementById('login-email');
+    const loginEmailError = document.getElementById('login-email-error');
+    const loginPasswordError = document.getElementById('login-password-error');
+    const registerEmail = document.getElementById('register-email');
+    const registerEmailError = document.getElementById('register-email-error');
+    const registerPasswordError = document.getElementById('register-password-error');
+    const confirmPassword = document.getElementById('confirm-password');
+    const confirmPasswordError = document.getElementById('confirm-password-error');
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let isValid = true;
+
+      if (!validateEmail(loginEmail.value)) {
+        showError(loginEmail, loginEmailError);
+        isValid = false;
+      } else {
+        hideError(loginEmail, loginEmailError);
+      }
+
+      if (loginPassword.value.trim() === '') {
+        showError(loginPassword, loginPasswordError);
+        isValid = false;
+      } else {
+        hideError(loginPassword, loginPasswordError);
+      }
+
+      if (isValid) {
+        // Success haptic and visual feedback
+        addSuccessRipple(document.getElementById('login-btn'));
+        // Here you would normally submit the form or make an API call
+        showSuccessMessage('Signing in...');
+      }
+    });
+
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let isValid = true;
+
+      if (!validateEmail(registerEmail.value)) {
+        showError(registerEmail, registerEmailError);
+        isValid = false;
+      } else {
+        hideError(registerEmail, registerEmailError);
+      }
+
+      if (registerPassword.value.length < 8) {
+        showError(registerPassword, registerPasswordError);
+        isValid = false;
+      } else {
+        hideError(registerPassword, registerPasswordError);
+      }
+
+      if (confirmPassword.value !== registerPassword.value) {
+        showError(confirmPassword, confirmPasswordError);
+        isValid = false;
+      } else {
+        hideError(confirmPassword, confirmPasswordError);
+      }
+
+      if (isValid) {
+        // Success haptic and visual feedback
+        addSuccessRipple(document.getElementById('register-btn'));
+        // Here you would normally submit the form or make an API call
+        showSuccessMessage('Account created successfully!');
+      }
+    });
+
+    function validateEmail(email) {
+      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+    }
+
+    function showError(input, errorElement) {
+      input.classList.add('error');
+      errorElement.classList.add('visible');
+    }
+
+    function hideError(input, errorElement) {
+      input.classList.remove('error');
+      errorElement.classList.remove('visible');
+    }
+
+    // Haptic feedback simulation
+    function addHapticFeedback() {
+      if (navigator.vibrate) {
+        navigator.vibrate(15);
+      }
+    }
+
+    // Visual feedback with ripple effect
+    document.querySelectorAll('.submit-btn, .social-btn, .sign-up-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        addRipple(e, this);
+        addHapticFeedback();
+      });
+    });
+
+    function addRipple(e, element) {
+      const rect = element.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      
+      element.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    }
+
+    function addSuccessRipple(button) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      ripple.style.left = '50%';
+      ripple.style.top = '50%';
+      
+      button.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    }
+
+    function showSuccessMessage(message) {
+      // You could create a toast notification here
+      console.log(message);
+      // For now, we'll just log to console
+    }
+
+    // Input validation as user types
+    loginEmail.addEventListener('input', () => {
+      if (loginEmail.value && !validateEmail(loginEmail.value)) {
+        showError(loginEmail, loginEmailError);
+      } else {
+        hideError(loginEmail, loginEmailError);
+      }
+    });
+
+    registerEmail.addEventListener('input', () => {
+      if (registerEmail.value && !validateEmail(registerEmail.value)) {
+        showError(registerEmail, registerEmailError);
+      } else {
+        hideError(registerEmail, registerEmailError);
+      }
+    });
+
+    confirmPassword.addEventListener('input', () => {
+      if (confirmPassword.value && confirmPassword.value !== registerPassword.value) {
+        showError(confirmPassword, confirmPasswordError);
+      } else {
+        hideError(confirmPassword, confirmPasswordError);
+      }
+    });
+  </script>
+</body>
+</html>

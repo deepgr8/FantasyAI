@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenCrick Dashboard</title>
+    <style>
+        :root {
+            --primary-dark: #111827;
+            --secondary-dark: #1e293b;
+            --blue-accent: #0ea5e9;
+            --teal-accent: #06b6d4;
+            --green-accent: #10b981;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--blue-accent);
+        }
+        
+        .beta-badge {
+            background-color: var(--teal-accent);
+            color: var(--primary-dark);
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .pricing-pill {
+            background: linear-gradient(135deg, var(--blue-accent), var(--teal-accent));
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--blue-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        main {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .upload-section {
+            background-color: var(--secondary-dark);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px dashed var(--text-muted);
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: var(--blue-accent);
+        }
+        
+        .upload-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .upload-section p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, var(--blue-accent), var(--teal-accent));
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .dashboard-card {
+            background-color: var(--secondary-dark);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dashboard-card p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .card-icon {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background-color: rgba(14, 165, 233, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--blue-accent);
+        }
+        
+        .stat-card {
+            border-left: 4px solid var(--blue-accent);
+        }
+        
+        .prediction-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--green-accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .analysis-list {
+            list-style: none;
+        }
+        
+        .analysis-list li {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: rgba(148, 163, 184, 0.2);
+            border-radius: 3px;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(to right, var(--blue-accent), var(--teal-accent));
+        }
+        
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .player-item {
+            background-color: rgba(30, 41, 59, 0.8);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .player-item .player-chance {
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+            color: var(--green-accent);
+        }
+        
+        .weather-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .weather-icon {
+            font-size: 2rem;
+            color: var(--blue-accent);
+        }
+        
+        .weather-details {
+            flex: 1;
+        }
+        
+        .pitch-analysis {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .pitch-tag {
+            background-color: rgba(14, 165, 233, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .recent-uploads {
+            margin-top: 2rem;
+        }
+        
+        .recent-uploads h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .uploads-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .uploads-table th {
+            text-align: left;
+            padding: 1rem;
+            background-color: var(--secondary-dark);
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+        
+        .uploads-table td {
+            padding: 1rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        
+        .status-pill {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .status-completed {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--green-accent);
+        }
+        
+        .view-btn {
+            background-color: rgba(14, 165, 233, 0.1);
+            color: var(--blue-accent);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:hover {
+            background-color: rgba(14, 165, 233, 0.2);
+        }
+        
+        /* Floating insights */
+        .insight-bubble {
+            position: absolute;
+            background-color: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 3px solid var(--green-accent);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .insight-bubble:nth-child(odd) {
+            animation-delay: 2s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+            
+            main {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card-actions {
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        .detail-btn {
+            background: linear-gradient(135deg, var(--blue-accent), var(--teal-accent));
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            Gen<span>Crick</span> <div class="beta-badge">BETA</div>
+        </div>
+        <div class="user-profile">
+            <div class="pricing-pill">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 1a2 2 0 0 1 2 2v2H6V3a2 2 0 0 1 2-2zm3 4V3a3 3 0 1 0-6 0v2H3.36a1.5 1.5 0 0 0-1.483 1.277L.85 13.13A2.5 2.5 0 0 0 3.322 16h9.355a2.5 2.5 0 0 0 2.473-2.87l-1.028-6.853A1.5 1.5 0 0 0 12.64 5H11z"/>
+                </svg>
+                Just ₹1 per analysis
+            </div>
+            <div class="avatar">S</div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="upload-section">
+            <h2>Upload Your Team Screenshot</h2>
+            <p>Just ₹1 per team analysis. Get complete AI-powered insights, predictions, and optimization suggestions.</p>
+            <button class="upload-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                </svg>
+                Upload Team & Pay ₹1
+            </button>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="insight-bubble" style="top: 10px; right: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#10b981" viewBox="0 0 16 16">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                    </svg>
+                    Kohli: 85% chance of 50+ runs
+                </div>
+                <h3>
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.25-11.25v1.5a1 1 0 0 1-2 0v-1.5a1 1 0 0 1 2 0zm0 5v1.5a1 1 0 0 1-2 0v-1.5a1 1 0 0 1 2 0z"/>
+                        </svg>
+                    </div>
+                    Player Performance Predictions
+                </h3>
+                <div class="prediction-tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                    </svg>
+                    Based on recent form
+                </div>
+                <div class="player-grid">
+                    <div class="player-item">
+                        Kohli
+                        <div class="player-chance">85%</div>
+                    </div>
+                    <div class="player-item">
+                        Rohit
+                        <div class="player-chance">78%</div>
+                    </div>
+                    <div class="player-item">
+                        Bumrah
+                        <div class="player-chance">92%</div>
+                    </div>
+                    <div class="player-item">
+                        Maxwell
+                        <div class="player-chance">75%</div>
+                    </div>
+                    <div class="player-item">
+                        Russell
+                        <div class="player-chance">68%</div>
+                    </div>
+                    <div class="player-item">
+                        Rashid
+                        <div class="player-chance">88%</div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="detail-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        Detailed Analysis
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3>
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                        </svg>
+                    </div>
+                    Venue-Specific Analysis
+                </h3>
+                <p>M.Chinnaswamy Stadium, Bangalore</p>
+                <div class="analysis-list">
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0ea5e9" viewBox="0 0 16 16">
+                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                        </svg>
+                        Batting-friendly pitch
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%"></div>
+                        </div>
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0ea5e9" viewBox="0 0 16 16">
+                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                        </svg>
+                        Average first innings score: 178
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0ea5e9" viewBox="0 0 16 16">
+                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                        </svg>
+                        Spin effectiveness
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%"></div>
+                        </div>
+                    </li>
+                </div>
+                <div class="card-actions">
+                    <button class="detail-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        Detailed Analysis
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="insight-bubble" style="bottom: 10px; right: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#10b981" viewBox="0 0 16 16">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                    </svg>
+                    Bumrah: Best pick vs RCB
+                </div>
+                <h3>
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zm1.443 12.643L7.05 9.636l2.121-2.121 3.443 3.442-2.121 2.121z"/>
+                        </svg>
+                    </div>
+                    Pitch & Weather Analysis
+                </h3>
+                <div class="weather-info">
+                    <div class="weather-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+                        </svg>
+                    </div>
+                    <div class="weather-details">
+                        <h4>Clear Sky, 26°C</h4>
+                        <p>Humidity: 65%, Wind: 8 km/h</p>
+                    </div>
+                </div>
+                <p>Impact on match: Dew likely to be a factor in the second innings.</p>
+                <div class="pitch-analysis">
+                    <div class="pitch-tag">Good for batting</div>
+                    <div class="pitch-tag">Some turn for spinners</div>
+                    <div class="pitch-tag">Even bounce</div>
+                    <div class="pitch-tag">Dew impact: High</div>
+                </div>
+                <div class="card-actions">
+                    <button class="detail-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        Detailed Analysis
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3>
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                    </div>
+                    Smart Team Recommendations
+                </h3>
+                <div class="analysis-list">
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#10b981" viewBox="0 0 16 16">
+                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                        </svg>
+                        Captain: Kohli (2x points)
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#10b981" viewBox="0 0 16 16">
+                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                        </svg>
+                        Vice Captain: Bumrah (1.5x points)
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0ea5e9" viewBox="0 0 16 16">
+                            <path d="M9.502 5.513a.144.144 0 0 0-.202.134V6.65a.5.5 0 0 1-.5.5H2.5v2h6.3a.5.5 0 0 1 .5.5v1.003c0 .108.11.176.202.134l3.984-2.933a.51.51 0 0 1 .042-.028.147.147 0 0 0 0-.252.51.51 0 0 1-.042-.028L9.502 5.513zM8.3 5.647a1.144 1.144 0 0 1 1.767-.96l3.994 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a1.144 1.144 0 0 1-1.767-.96v-.503H2a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5h6.3v-.503z"/>
+                        </svg>
+                        Replace Starc with Natarajan (better form)
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#0ea5e9" viewBox="0 0 16 16">
+                            <path d="M9.502 5.513a.144.144 0 0 0-.202.134V6.65a.5.5 0 0 1-.5.5H2.5v2h6.3a.5.5 0 0 1 .5.5v1.003c0 .108.11.176.202.134l3.984-2.933a.51.51 0 0 1 .042-.028.147.147 0 0 0 0-.252.51.51 0 0 1-.042-.028L9.502 5.513zM8.3 5.647a1.144 1.144 0 0 1 1.767-.96l3.994 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a1.144 1.144 0 0 1-1.767-.96v-.503H2a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5h6.3v-.503z"/>
+                        </svg>
+                        Add more spinners for Bangalore pitch
+                    </li>
+                </div>
+                <div class="card-actions">
+                    <button class="detail-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        Detailed Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recent-uploads">
+            <h2>Recent Analyses</h2>
+            <table class="uploads-table">
+                <thead>
+                    <tr>
+                        <th>Match</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Team Points</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>RCB vs MI</td>
+                        <td>16 Feb 2025</td>
+                        <td><span class="status-pill status-completed">Completed</span></td>
+                        <td>845</td>
+                        <td><button class="view-btn">View Result</button></td>
+                    </tr>
+                    <tr>
+                        <td>CSK vs KKR</td>
+                        <td>14 Feb 2025</td>
+                        <td><span class="status-pill status-completed">Completed</span></td>
+                        <td>765</td>
+                        <td><button class="view-btn">View Result</button></td>
+                    </tr>
+                    <tr>
+                        <td>DC vs RR</td>
+                        <td>10 Feb 2025</td>
+                        <td><span class="status-pill status-completed">Completed</span></td>
+                        <td>802</td>
+                        <td><button class="view-btn">View Result</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // Add some basic interactivity
+        document.querySelector('.upload-btn').addEventListener('click', function() {
+            alert('This is a demo. In a real app, this would open a file upload dialog.');
+        });
+        
+        const viewButtons = document.querySelectorAll('.view-btn');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                alert('This would navigate to the detailed analysis view for this match.');
+            });
+        });
+        
+        // Create floating insights animation
+        const cards = document.querySelectorAll('.dashboard-card');
+        cards.forEach(card => {
+            if (!card.querySelector('.insight-bubble')) {
+                const bubble = document.createElement('div');
+                bubble.className = 'insight-bubble';
+                
+                // Random position
+                const top = Math.random() * 70 + 10;
+                const left = Math.random() * 50 + 10;
+                bubble.style.top = `${top}%`;
+                bubble.style.left = `${left}%`;
+                
+                const icon = document.createElement('svg');
+                icon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                icon.setAttribute('width', '12');
+                icon.setAttribute('height', '12');
+                icon.setAttribute('fill', '#10b981');
+                icon.setAttribute('viewBox', '0 0 16 16');
+                
+                const path = document.createElement('path');
+                path.setAttribute('d', 'M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z');
+                
+                icon.appendChild(path);
+                bubble.appendChild(icon);
+                
+                const insights = [
+                    'Toss advantage: Bowl first',
+                    'Jadeja: Good matchup vs RCB',
+                    'Consider more pacers today',
+                    'Hardik likely to score 30+',
+                    'Pitch favors big hitters'
+                ];
+                
+                const randomInsight = insights[Math.floor(Math.random() * insights.length)];
+                bubble.appendChild(document.createTextNode(' ' + randomInsight));
+                
+                card.appendChild(bubble);
+            }
+        });
+        // Add functionality for detail buttons
+        const detailButtons = document.querySelectorAll('.detail-btn');
+        detailButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const cardTitle = this.closest('.dashboard-card').querySelector('h3').textContent.trim();
+                alert(`This would open a detailed analysis view for: ${cardTitle}`);
+            });
+        });
+    </script>
+</body>
+</html>
